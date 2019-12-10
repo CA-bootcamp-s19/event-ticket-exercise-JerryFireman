@@ -52,6 +52,7 @@ contract EventTicketsV2 {
         newEvent.website = _website;
         newEvent.totalTickets = _totalTickets;
         newEvent.isOpen = true;
+        emit LogEventAdded(_description, _website, _totalTickets, idGenerator);
         idGenerator++;
         return idGenerator - 1;
     }

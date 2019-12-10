@@ -1399,12 +1399,12 @@
     "1575934428199": {
       "events": {},
       "links": {},
-      "address": "0x59F47a2746EC99Ae3e34b458e33f5168534F66DF",
-      "transactionHash": "0x381a5cc5cd1581b90a427e80a013ede96a4d3d7d3d2eed70fc33c139e8b34e72"
+      "address": "0x96F8e72bD58A5932bc276100a9a66ECF316Dae0B",
+      "transactionHash": "0x44309919c9657a14dce60c6008e66ec3f8b668a7b55a36e97e5fff46a353186f"
     }
   },
   "schemaVersion": "3.0.19",
-  "updatedAt": "2019-12-10T01:49:53.033Z",
+  "updatedAt": "2019-12-10T02:19:54.845Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

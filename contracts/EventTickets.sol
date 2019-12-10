@@ -80,7 +80,7 @@ contract EventTickets {
         public
         payable
     {
-        require(myEvent.isOpen = true, "Ticket sales have closed for this event");
+        require(myEvent.isOpen == true, "Ticket sales have closed for this event");
         require(msg.value >= TICKET_PRICE * _ticketsPurchased, "Insufficient funds were sent with order");
         require((myEvent.totalTickets - myEvent.sales) >= _ticketsPurchased, "Not enough tickets left to fill your order");
         myEvent.buyerTicketCount[msg.sender] += _ticketsPurchased;
