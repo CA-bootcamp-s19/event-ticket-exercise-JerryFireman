@@ -126,7 +126,7 @@ contract('EventTicket', function(accounts) {
                 await catchRevert(instance.endSale({from: secondAccount}))
             })
 
-            it("tickets should be able to be purchased when the event is not open", async() => {
+            it("tickets should not be able to be purchased when the event is not open", async() => {
                 await instance.endSale({from: firstAccount})
                 await catchRevert(instance.buyTickets(1, {from: secondAccount, value: ticketPrice}))
             })

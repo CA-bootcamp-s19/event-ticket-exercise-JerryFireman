@@ -33,7 +33,7 @@ contract EventTickets {
     event LogEndSale(address, uint);
 
     // @dev Throws error if the msg.sender is not the owner of the contract
-    modifier onlyOwner () {
+    modifier onlyOwner {
         require(msg.sender == owner, "Message sender is not owner of contract");
         _;
     }
@@ -45,6 +45,8 @@ contract EventTickets {
         myEvent.description = _description;
         myEvent.website = _website;
         myEvent.totalTickets = _totalTickets;
+        myEvent.sales = 0;
+        myEvent.isOpen = true;
     }
 
     // @dev Returns the details of myEvent
@@ -63,52 +65,53 @@ contract EventTickets {
 
     // @dev Returns the number of tickets that address has purchased
     // @param Buyer's address
-    function getBuyerTicketCount(address buyer)
+    function getBuyerTicketCount(address _buyer)
         public
         view
         returns(uint buyerTicketCount)
     {
-        buyerTicketCount = myEvent.buyerTicketCount[buyer];
+        buyerTicketCount = myEvent.buyerTicketCount[_buyer];
         return(buyerTicketCount);
     }
 
     // @dev Allows someone to purchase tickets for the event
     // @param Number of tickets to be purchased
-    function buyTickets(uint ticketsPurchased)
+    function buyTickets(uint _ticketsPurchased)
         public
         payable
     {
         require(myEvent.isOpen = true, "Ticket sales have closed for this event");
-        require(msg.value >= TICKET_PRICE * ticketsPurchased, "Insufficient funds were sent with order");
-        require(myEvent.totalTickets >= ticketsPurchased, "Not enough tickets left to fill your order");
-        myEvent.buyerTicketCount[msg.sender] = ticketsPurchased;
-        myEvent.totalTickets -= ticketsPurchased;
-        emit LogBuyTickets(msg.sender, ticketsPurchased);
-        if (msg.value >= TICKET_PRICE * ticketsPurchased) {
-            msg.sender.transfer(msg.value - (TICKET_PRICE * ticketsPurchased));
-            emit LogGetRefund(msg.sender, msg.value - (TICKET_PRICE * ticketsPurchased));
+        require(msg.value >= TICKET_PRICE * _ticketsPurchased, "Insufficient funds were sent with order");
+        require((myEvent.totalTickets - myEvent.sales) >= _ticketsPurchased, "Not enough tickets left to fill your order");
+        myEvent.buyerTicketCount[msg.sender] += _ticketsPurchased;
+        myEvent.sales += _ticketsPurchased;
+        emit LogBuyTickets(msg.sender, _ticketsPurchased);
+        if (msg.value > TICKET_PRICE * _ticketsPurchased) {
+            msg.sender.transfer(msg.value - (TICKET_PRICE * _ticketsPurchased));
+            emit LogGetRefund(msg.sender, msg.value - (TICKET_PRICE * _ticketsPurchased));
         }
     }
+
+    // @dev Enables buyer to request refund for tickets they have ordered
+    function getRefund()
+        public
+    {
+        require(myEvent.buyerTicketCount[msg.sender] > 0, "You haven't purchased tickets for this event");
+        myEvent.totalTickets += myEvent.buyerTicketCount[msg.sender];
+        msg.sender.transfer(myEvent.buyerTicketCount[msg.sender] * TICKET_PRICE);
+        emit LogGetRefund(msg.sender, myEvent.buyerTicketCount[msg.sender] * TICKET_PRICE);
+        myEvent.buyerTicketCount[msg.sender] = 0;
+        myEvent.sales -= myEvent.buyerTicketCount[msg.sender];
+
+    }
+
+    // @dev Closes ticket sales
+    function endSale()
+        public
+        onlyOwner
+    {
+        myEvent.isOpen = false;
+        emit LogEndSale(owner, address(this).balance);
+        owner.transfer(address(this).balance);
+    }
 }
-
-    //function getRefund()
-
-    /*
-        Define a function called getRefund().
-        This function allows someone to get a refund for tickets for the account they purchased from.
-        TODO:
-            - Check that the requester has purchased tickets.
-            - Make sure the refunded tickets go back into the pool of avialable tickets.
-            - Transfer the appropriate amount to the refund requester.
-            - Emit the appropriate event.
-    */
-
-    /*
-        Define a function called endSale().
-        This function will close the ticket sales.
-        This function can only be called by the contract owner.
-        TODO:
-            - close the event
-            - transfer the contract balance to the owner
-            - emit the appropriate event
-    */
